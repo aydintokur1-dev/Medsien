@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SearchLg } from "@untitledui/icons";
-import { FILTER_STATUSES, FLIGHTS } from "@/data/scenario";
+import { FILTER_STATUSES, FLIGHTS, hasFlightDetail } from "@/data/scenario";
 import { ButtonGroup, CardHeader, CheckboxTag, SearchInput, buttonClasses, cn, iconStroke } from "@/components/ui";
 import { FlightsTable } from "./FlightsTable";
 import { FlightRow } from "./FlightRow";
@@ -130,7 +130,14 @@ export function FlightsCard({ onOpenFlight, selectedFlightId }: { onOpenFlight: 
               <EmptyState onClear={f.clear} />
             </li>
           ) : (
-            f.rows.map((row) => <FlightRow key={row.id} f={row} selected={selectedFlightId === row.id} onOpen={() => onOpenFlight(row.id)} />)
+            f.rows.map((row) => (
+              <FlightRow
+                key={row.id}
+                f={row}
+                selected={selectedFlightId === row.id}
+                onOpen={hasFlightDetail(row.id) ? () => onOpenFlight(row.id) : undefined}
+              />
+            ))
           )}
         </ul>
         {/* Figma footer: pt 12 · gap 8 · pb 16; the link keeps a 44 px tap area without adding height (-my-3). */}

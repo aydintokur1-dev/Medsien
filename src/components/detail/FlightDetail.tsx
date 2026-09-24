@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Check, Plane, XClose } from "@untitledui/icons";
-import { ALERTS, FLIGHTS, FLIGHT_DETAIL_MD241, NOW, type Flight } from "@/data/scenario";
+import { ALERTS, FLIGHTS, FLIGHT_DETAIL_MD241, hasFlightDetail, type Flight } from "@/data/scenario";
 import { AssumptionTag, Button, FreshnessIndicator, IconButton, SeverityBadge, StatusBadge, Tag, cn, iconStroke } from "@/components/ui";
 import { useDialog } from "./useDialog";
 
@@ -13,15 +13,8 @@ import { useDialog } from "./useDialog";
  * Content (px 24 · pt 16 · pb 24 · gap 20): status row → Times → Delay reason → Gate → Details → Activity;
  * sections have a 1 px border-secondary top line, pt 16, title Text sm/Semibold secondary, gap 10.
  * Footer (border-t, px 24 · py 16, right-aligned): "Notify gate agent" (secondary, not designed) + "Acknowledge alert".
- * Only MD241 is designed in full; other flights show the same shell with the data we have (no invented sections).
+ * Only MD241 is designed, so it is the only flight that opens (see hasFlightDetail); other rows are static, as in Figma.
  */
-
-const minutesBetween = (from: string, to: string) => {
-  const [fh, fm] = from.split(":").map(Number);
-  const [th, tm] = to.split(":").map(Number);
-  return th * 60 + tm - (fh * 60 + fm);
-};
-const fmtDuration = (m: number) => (m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`);
 
 function Section({ title, right, children, className }: { title: string; right?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
@@ -53,14 +46,7 @@ function ConflictTile({ label }: { label: string }) {
 }
 
 function DetailBody({ flight }: { flight: Flight }) {
-  const md241 = flight.id === FLIGHT_DETAIL_MD241.flightId;
   const d = FLIGHT_DETAIL_MD241;
-  const est = flight.est;
-  const isDep = flight.direction === "Departure";
-  const timeUntil = est ? minutesBetween(NOW.time, est) : null;
-  const estColor =
-    flight.estTone === "delayed-long" ? "text-orange-700" : flight.estTone === "delayed" ? "text-warning-700" : "text-primary";
-  const changed = flight.estTone !== "same" && flight.estTone !== "none";
 
   return (
     <div className="flex flex-col gap-5">
@@ -73,82 +59,64 @@ function DetailBody({ flight }: { flight: Flight }) {
           <div className="flex w-full items-start gap-4">
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <p className="text-xs font-medium text-tertiary">Scheduled</p>
-              <p className={cn("text-lg font-semibold", changed || !est ? "text-quaternary line-through" : "text-primary")}>{flight.sched}</p>
+              <p className="text-lg font-semibold text-quaternary line-through">{d.times.scheduled}</p>
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <p className="text-xs font-medium text-tertiary">Estimated</p>
-              <p className={cn("text-lg font-semibold", est ? estColor : "text-quaternary")}>{est ?? "—"}</p>
+              <p className="text-lg font-semibold text-orange-700">{d.times.estimated}</p>
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <p className="text-xs font-medium text-tertiary">{isDep ? "Departs in" : "Arrives in"}</p>
-              <p className="text-lg font-semibold text-primary">
-                {md241 ? d.times.departsIn : timeUntil !== null && timeUntil > 0 ? fmtDuration(timeUntil) : "—"}
-              </p>
+              <p className="text-xs font-medium text-tertiary">Departs in</p>
+              <p className="text-lg font-semibold text-primary">{d.times.departsIn}</p>
             </div>
           </div>
         </Section>
       </div>
 
-      {md241 && (
-        <Section title="Delay reason">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-normal text-primary">{d.delayReason.text}</p>
-            <Tag>{d.delayReason.code}</Tag>
-            <AssumptionTag />
-          </div>
-        </Section>
-      )}
+      <Section title="Delay reason">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-normal text-primary">{d.delayReason.text}</p>
+          <Tag>{d.delayReason.code}</Tag>
+          <AssumptionTag />
+        </div>
+      </Section>
 
       <Section title="Gate" right={<FreshnessIndicator state="current" style="inline" />} className="gap-4">
         <div className="flex w-full items-start gap-3">
-          {md241 ? (
-            <ConflictTile label={d.gate.gate} />
-          ) : (
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-sm bg-bg-tertiary ring-1 ring-inset ring-border-secondary">
-              <span className="text-xs font-medium text-tertiary">{flight.gate}</span>
-            </div>
-          )}
+          <ConflictTile label={d.gate.gate} />
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <p className="text-sm font-medium text-primary">{md241 ? d.gate.title : `Gate ${flight.gate}`}</p>
-            {md241 ? (
-              <p className="text-xs font-normal text-tertiary">
-                {d.gate.lines[0]}
-                <br />
-                {d.gate.lines[1]}
-              </p>
-            ) : (
-              flight.gateNote && <p className="text-xs font-medium text-warning-700">{flight.gateNote}</p>
-            )}
+            <p className="text-sm font-medium text-primary">{d.gate.title}</p>
+            <p className="text-xs font-normal text-tertiary">
+              {d.gate.lines[0]}
+              <br />
+              {d.gate.lines[1]}
+            </p>
           </div>
         </div>
       </Section>
 
-      {md241 && (
-        <Section title="Details">
-          <dl className="flex w-full flex-col gap-2 text-sm">
-            {d.details.map((row) => (
-              <div key={row.label} className="flex items-start justify-between gap-4">
-                <dt className="font-normal text-tertiary">{row.label}</dt>
-                <dd className="font-medium text-primary">{row.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </Section>
-      )}
+      <Section title="Details">
+        <dl className="flex w-full flex-col gap-2 text-sm">
+          {d.details.map((row) => (
+            <div key={row.label} className="flex items-start justify-between gap-4">
+              <dt className="font-normal text-tertiary">{row.label}</dt>
+              <dd className="font-medium text-primary">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
 
-      {md241 && (
-        <Section title="Activity">
-          <ol className="flex flex-col gap-2.5">
-            {d.activity.map((e) => (
-              <li key={e.time} className="flex items-center gap-3">
-                <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-gray-400" />
-                <span className="text-xs font-medium text-quaternary">{e.time}</span>
-                <span className="text-sm font-normal text-secondary">{e.text}</span>
-              </li>
-            ))}
-          </ol>
-        </Section>
-      )}
+      <Section title="Activity">
+        <ol className="flex flex-col gap-2.5">
+          {d.activity.map((e) => (
+            <li key={e.time} className="flex items-center gap-3">
+              <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-gray-400" />
+              <span className="text-xs font-medium text-quaternary">{e.time}</span>
+              <span className="text-sm font-normal text-secondary">{e.text}</span>
+            </li>
+          ))}
+        </ol>
+      </Section>
     </div>
   );
 }
@@ -164,7 +132,7 @@ export function FlightDetail({
   acknowledged: Map<string, string>;
   onAcknowledge: (alertId: string) => void;
 }) {
-  const flight = FLIGHTS.find((f) => f.id === flightId) ?? null;
+  const flight = flightId && hasFlightDetail(flightId) ? (FLIGHTS.find((f) => f.id === flightId) ?? null) : null;
   const ref = useDialog(Boolean(flight), onClose);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
   useEffect(() => {
@@ -177,11 +145,8 @@ export function FlightDetail({
 
   if (!flight || isDesktop === null) return null;
 
-  const md241 = flight.id === FLIGHT_DETAIL_MD241.flightId;
   const alert = ALERTS.find((a) => a.opensFlight === flight.id);
   const ackBy = alert ? alert.acknowledgedBy ?? acknowledged.get(alert.id) : undefined;
-  const title = `${flight.id}${flight.illustrative ? " *" : ""} · ${flight.airline}`;
-  const route = md241 ? FLIGHT_DETAIL_MD241.route : `${flight.from} → ${flight.to} · ${flight.direction}`;
 
   const actions = (layout: "desktop" | "mobile") => {
     const size = layout === "mobile" ? "lg" : "md";
@@ -213,16 +178,16 @@ export function FlightDetail({
         <FeaturedIcon />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-primary">
           <h2 id="flight-detail-title" tabIndex={-1} data-autofocus className={cn("font-semibold outline-none", layout === "mobile" ? "text-lg" : "text-xl")}>
-            {title}
+            {FLIGHT_DETAIL_MD241.title}
           </h2>
-          {layout === "mobile" && md241 ? (
+          {layout === "mobile" ? (
             <p className="text-md font-normal">
               {FLIGHT_DETAIL_MD241.routeMobile[0]}
               <br />
               {FLIGHT_DETAIL_MD241.routeMobile[1]}
             </p>
           ) : (
-            <p className="text-md font-normal">{route}</p>
+            <p className="text-md font-normal">{FLIGHT_DETAIL_MD241.route}</p>
           )}
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ALERTS, KPIS, NOW } from "@/data/scenario";
+import { ALERTS, KPIS, NOW, hasFlightDetail } from "@/data/scenario";
 import { AppHeader } from "./AppHeader";
 import { PageHeader } from "./PageHeader";
 import { KpiStrip } from "./KpiStrip";
@@ -38,7 +38,7 @@ export function Dashboard() {
     const id = new URLSearchParams(window.location.search).get("flight");
     // Read after hydration on purpose: the server can't see the URL, so doing it in render would mismatch.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (id) setFlightId(id.toUpperCase());
+    if (id && hasFlightDetail(id.toUpperCase())) setFlightId(id.toUpperCase());
   }, []);
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -74,15 +74,19 @@ export function Dashboard() {
   }, [undoId, setToast]);
   const dismissToast = useCallback(() => setToast(null), [setToast]);
 
+  // Only MD241's detail is designed (as in Figma); nothing else opens the panel.
+  const openFlight = useCallback((id: string) => {
+    if (hasFlightDetail(id)) setFlightId(id);
+  }, []);
   const viewAlert = useCallback((alertId: string) => {
     const a = ALERTS.find((x) => x.id === alertId);
     if (a?.opensFlight) {
-      setFlightId(a.opensFlight);
+      openFlight(a.opensFlight);
       return;
     }
     // Other linked objects (gates, checkpoints) have no designed detail yet.
     setToast({ message: "Detail for this alert is not designed in this case study", tone: "info" });
-  }, [setToast]);
+  }, [openFlight, setToast]);
 
   // KPI cards lead to full-day views (Alerts / Flights / Gates pages), which the case study does not design.
   const openKpi = useCallback((kpiId: string) => {
@@ -110,7 +114,7 @@ export function Dashboard() {
             <AlertsCard acknowledged={acknowledged} onAcknowledge={acknowledge} onView={viewAlert} />
           </div>
           <div className="min-w-0 wide:col-start-1 wide:row-span-2 wide:row-start-1">
-            <FlightsCard onOpenFlight={setFlightId} selectedFlightId={flightId} />
+            <FlightsCard onOpenFlight={openFlight} selectedFlightId={flightId} />
           </div>
           <div className="min-w-0 wide:col-start-2 wide:row-start-2">
             <GatePanel onGateTap={setGateId} selectedGate={gateId} />
@@ -128,7 +132,7 @@ export function Dashboard() {
         onClose={closeGate}
         onViewFlight={(id) => {
           setGateId(null);
-          setFlightId(id);
+          openFlight(id);
         }}
       />
       <Toast message={toast?.message ?? null} id={toast?.id} tone={toast?.tone} onUndo={toast?.undoId ? undo : undefined} onDismiss={dismissToast} />

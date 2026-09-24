@@ -8,7 +8,7 @@ Coded version of my Medsien UI/UX take-home: an airport operations dashboard for
 
 - **KPI cards:** clickable, with a hover state. Each one would open the full-day list behind its number (the Alerts, Flights or Gates page). Those pages aren't designed, so a click shows a note saying so.
 - **Flights:** filter by direction, filter by status (multi-select), search by flight, airline, city or gate, and sort by "Needs attention" or time.
-- **Flight detail:** click a row, or "View" on the MD241 alert, to open the slide-out panel. On mobile it opens as a bottom sheet. You can deep-link to it with `?flight=MD241`.
+- **Flight detail:** click the MD241 row, or "View" on its alert, to open the slide-out panel. On mobile it opens as a bottom sheet, and it also opens from gate B06. You can deep-link to it with `?flight=MD241`. As in the Figma file, MD241 is the one worked example; the other rows would open the same panel with their own data.
 - **Alerts:** Acknowledge shows a toast with Undo. Acknowledged alerts stay in the list, greyed, with who and when.
 - **Gates:** hover a tile (or focus it with the keyboard) on desktop for a tooltip. On mobile, tap a tile to open the gate sheet (B06 shows the full conflict).
 - **Sticky page header:** it switches to its "Scrolled" state once the content moves under it.

@@ -1,12 +1,13 @@
 "use client";
 
-import type { Flight } from "@/data/scenario";
+import { hasFlightDetail, type Flight } from "@/data/scenario";
 import { SeverityBadge, StatusBadge, TableHeaderCell, cn } from "@/components/ui";
 
 /*
  * Flights table 108:9309 — columns 172 / flexible / 84 / 84 / 156 / 128 / 116, header 44 px, rows 56 px.
  * Cells: 1 px border-secondary bottom, px 16 (first column pl 24), Text sm (14/20).
- * The WHOLE row reacts to hover (bg-secondary on every cell at once) and opens the flight detail.
+ * The MD241 row is the one designed as clickable: the WHOLE row reacts to hover (bg-secondary on every cell at once)
+ * and opens the flight detail. Other rows are static, as in Figma (their detail is not designed).
  */
 const COLS = ["w-[172px]", "", "w-[84px]", "w-[84px]", "w-[156px]", "w-[128px]", "w-[116px]"];
 
@@ -56,7 +57,9 @@ export function FlightsTable({
               </td>
             </tr>
           ) : (
-            rows.map((f) => <Row key={f.id} f={f} selected={selectedFlightId === f.id} onOpen={() => onOpenFlight(f.id)} />)
+            rows.map((f) => (
+              <Row key={f.id} f={f} selected={selectedFlightId === f.id} onOpen={hasFlightDetail(f.id) ? () => onOpenFlight(f.id) : undefined} />
+            ))
           )}
         </tbody>
       </table>
@@ -64,25 +67,31 @@ export function FlightsTable({
   );
 }
 
-function Row({ f, selected, onOpen }: { f: Flight; selected: boolean; onOpen: () => void }) {
+function Row({ f, selected, onOpen }: { f: Flight; selected: boolean; onOpen?: () => void }) {
   const cancelled = f.status.kind === "cancelled";
   const td = "h-14 border-b border-border-secondary px-4 align-middle text-sm whitespace-nowrap";
+  const interactive = onOpen
+    ? {
+        tabIndex: 0,
+        role: "button",
+        "aria-label": `${f.id}${f.illustrative ? " (illustrative)" : ""}, ${f.airline} ${f.direction.toLowerCase()}, ${f.from} to ${f.to}, ${f.status.label}, gate ${f.gate}. Open details`,
+        "aria-pressed": selected,
+        onClick: onOpen,
+        onKeyDown: (e: React.KeyboardEvent<HTMLTableRowElement>) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onOpen();
+          }
+        },
+      }
+    : {};
   return (
     <tr
-      tabIndex={0}
-      role="button"
-      aria-label={`${f.id}${f.illustrative ? " (illustrative)" : ""}, ${f.airline} ${f.direction.toLowerCase()}, ${f.from} to ${f.to}, ${f.status.label}, gate ${f.gate}. Open details`}
-      aria-pressed={selected}
-      onClick={onOpen}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onOpen();
-        }
-      }}
+      {...interactive}
       className={cn(
-        "cursor-pointer transition-colors duration-100 focus-visible:-outline-offset-2",
-        selected ? "bg-bg-secondary" : "bg-bg-primary hover:bg-bg-secondary",
+        onOpen
+          ? cn("cursor-pointer transition-colors duration-100 focus-visible:-outline-offset-2", selected ? "bg-bg-secondary" : "bg-bg-primary hover:bg-bg-secondary")
+          : "bg-bg-primary",
       )}
     >
       <td className={cn(td, "pl-6")}>

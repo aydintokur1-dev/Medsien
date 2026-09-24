@@ -190,6 +190,9 @@ export const FLIGHT_DETAIL_MD241 = {
   actions: { secondary: "Notify gate agent", primary: "Acknowledge alert", alertId: "a5" },
 };
 
+/** Only MD241's detail is designed (as in Figma), so it is the only flight that opens the panel / sheet. */
+export const hasFlightDetail = (flightId: string) => flightId === FLIGHT_DETAIL_MD241.flightId;
+
 /** Mobile gate sheet (tap B06). */
 export const GATE_SHEET_B06 = {
   gate: "B06",
