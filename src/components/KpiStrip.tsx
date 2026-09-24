@@ -16,7 +16,7 @@ import { KpiCard } from "@/components/ui";
 export function KpiStrip({ onOpen }: { onOpen: (kpiId: string) => void }) {
   return (
     <section aria-label="Key metrics" className="w-full min-w-0">
-      {/* Mobile (< lg). py-1 / -my-1 keeps the cards' shadow-xs and focus ring from being clipped by the scroller.
+      {/* Mobile (< lg). py-1 / -my-1 keeps the cards' focus ring from being clipped by the scroller.
           The cards are links, so keyboard users reach (and scroll to) every card without an extra tab stop. */}
       <div
         role="region"

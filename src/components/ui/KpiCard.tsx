@@ -15,7 +15,7 @@ export interface KpiCardProps {
 
 /*
  * KPI card 15:1666 — kit Metric item (Simple) + one supporting line.
- * White, 1 px border-secondary, radius-xl 12, shadow-xs; metric pt 16 · px 16 · pb 4 · gap 4:
+ * White, 1 px border-secondary, radius-xl 12, no shadow; metric pt 16 · px 16 · pb 4 · gap 4:
  * label Text sm/Medium text-tertiary, value Display sm/Semibold text-primary;
  * supporting px 16 · pb 16, Text xs/Regular text-tertiary (Critical: Text xs/Semibold error-700).
  * Interaction=Hover (clickable cards): fill bg-secondary + border-primary, the same one-step-darker rule
@@ -36,7 +36,7 @@ export function KpiCard({ label, value, line, tone = "default", onClick, classNa
       </div>
     </>
   );
-  const base = "flex w-full flex-col overflow-hidden rounded-xl border border-border-secondary bg-bg-primary shadow-xs";
+  const base = "flex w-full flex-col overflow-hidden rounded-xl border border-border-secondary bg-bg-primary";
 
   if (!onClick) return <div className={cn(base, className)}>{body}</div>;
 
