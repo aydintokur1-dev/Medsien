@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Istanbul Regional · Operations overview
 
-## Getting Started
+Coded version of my Medsien UI/UX take-home: an airport operations dashboard for the duty manager at a fictional regional airport. It follows the Figma design 1:1 (desktop 1440, mobile 375).
 
-First, run the development server:
+**Case study prototype · fictional data. Not a real airport system.**
+
+## What works
+
+- **Flights:** filter by direction, filter by status (multi-select), search by flight, airline, city or gate, and sort by "Needs attention" or time.
+- **Flight detail:** click a row, or "View" on the MD241 alert, to open the slide-out panel. On mobile it opens as a bottom sheet. You can deep-link to it with `?flight=MD241`.
+- **Alerts:** Acknowledge shows a toast with Undo. Acknowledged alerts stay in the list, greyed, with who and when.
+- **Gates:** hover a tile (or focus it with the keyboard) on desktop for a tooltip. On mobile, tap a tile to open the gate sheet (B06 shows the full conflict).
+- **Sticky page header:** it switches to its "Scrolled" state once the content moves under it.
+- **Keyboard and screen readers:** Esc closes panels, focus stays inside open panels and returns to where it was on close, and reduced motion is respected.
+
+Screens and links that the case study didn't design (the Flights, Gates and Alerts pages, notifications, the account menu) are shown but do nothing.
+
+## Stack
+
+Next.js (App Router), React, TypeScript and Tailwind CSS v4. Design tokens are copied from the Figma variables (Untitled UI kit) into `src/app/globals.css`, and the icons are `@untitledui/icons`. All scenario data lives in `src/data/scenario.ts`.
+
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Then open http://localhost:3000.
