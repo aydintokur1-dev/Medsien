@@ -13,20 +13,20 @@ import { KpiCard } from "@/components/ui";
  * wrap as in the design. The next card peeking in is the scroll cue, and the scrollbar is hidden.
  * "Flights today" uses the short mobile line ("94 dep · 92 arr").
  */
-export function KpiStrip() {
+export function KpiStrip({ onOpen }: { onOpen: (kpiId: string) => void }) {
   return (
     <section aria-label="Key metrics" className="w-full min-w-0">
-      {/* Mobile (< lg). py-1 / -my-1 keeps the cards' shadow-xs from being clipped by the scroller. */}
+      {/* Mobile (< lg). py-1 / -my-1 keeps the cards' shadow-xs and focus ring from being clipped by the scroller.
+          The cards are links, so keyboard users reach (and scroll to) every card without an extra tab stop. */}
       <div
         role="region"
         aria-label="Key metrics, scroll sideways for more"
-        tabIndex={0}
-        className="no-scrollbar -my-1 snap-x snap-mandatory scroll-px-4 overflow-x-auto overscroll-x-contain py-1 focus-visible:outline-offset-[-2px] lg:hidden"
+        className="no-scrollbar -my-1 snap-x snap-mandatory scroll-px-4 overflow-x-auto overscroll-x-contain py-1 lg:hidden"
       >
         <ul className="flex w-max gap-3 px-4">
           {KPIS.map((kpi) => (
             <li key={kpi.id} className="flex w-[152px] shrink-0 snap-start">
-              <KpiCard label={kpi.label} value={kpi.value} line={kpi.mobileLine ?? kpi.line} tone={kpi.tone} />
+              <KpiCard label={kpi.label} value={kpi.value} line={kpi.mobileLine ?? kpi.line} tone={kpi.tone} onClick={() => onOpen(kpi.id)} />
             </li>
           ))}
         </ul>
@@ -36,7 +36,7 @@ export function KpiStrip() {
       <ul className="hidden w-full gap-4 bg-bg-primary lg:flex">
         {KPIS.map((kpi) => (
           <li key={kpi.id} className="flex min-w-0 flex-1">
-            <KpiCard label={kpi.label} value={kpi.value} line={kpi.line} tone={kpi.tone} />
+            <KpiCard label={kpi.label} value={kpi.value} line={kpi.line} tone={kpi.tone} onClick={() => onOpen(kpi.id)} />
           </li>
         ))}
       </ul>

@@ -6,6 +6,7 @@ Coded version of my Medsien UI/UX take-home: an airport operations dashboard for
 
 ## What works
 
+- **KPI cards:** clickable, with a hover state. Each one would open the full-day list behind its number (the Alerts, Flights or Gates page). Those pages aren't designed, so a click shows a note saying so.
 - **Flights:** filter by direction, filter by status (multi-select), search by flight, airline, city or gate, and sort by "Needs attention" or time.
 - **Flight detail:** click a row, or "View" on the MD241 alert, to open the slide-out panel. On mobile it opens as a bottom sheet. You can deep-link to it with `?flight=MD241`.
 - **Alerts:** Acknowledge shows a toast with Undo. Acknowledged alerts stay in the list, greyed, with who and when.

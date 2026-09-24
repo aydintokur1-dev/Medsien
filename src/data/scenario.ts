@@ -39,14 +39,15 @@ export const FRESHNESS = {
   gates: { label: "Gates as of 10:00 · next 10:15", overdueLabel: "Gates overdue · 22 min old" },
 };
 
+/** Daily KPIs. `opens` = the full-day view a click leads to (those pages are not designed in the case study). */
 export const KPIS = [
-  { id: "open-alerts", label: "Open alerts", value: "7", line: "2 critical", tone: "critical" as const },
-  { id: "flights-today", label: "Flights today", value: "186", line: "94 departures · 92 arrivals", mobileLine: "94 dep · 92 arr" },
-  { id: "on-time", label: "On time", value: "128", line: "69% on-time rate" },
-  { id: "delayed", label: "Delayed", value: "34", line: "Avg. dep. delay 18 min" },
-  { id: "boarding", label: "Boarding", value: "12", line: "So far today" },
-  { id: "cancelled", label: "Cancelled", value: "4", line: "2% of today's flights" },
-  { id: "gates-in-use", label: "Gates in use", value: "28/34", line: "5 available · 1 unavailable" },
+  { id: "open-alerts", label: "Open alerts", value: "7", line: "2 critical", tone: "critical" as const, opens: "the Alerts page" },
+  { id: "flights-today", label: "Flights today", value: "186", line: "94 departures · 92 arrivals", mobileLine: "94 dep · 92 arr", opens: "the Flights page" },
+  { id: "on-time", label: "On time", value: "128", line: "69% on-time rate", opens: "the Flights page, filtered to on time" },
+  { id: "delayed", label: "Delayed", value: "34", line: "Avg. dep. delay 18 min", opens: "the Flights page, filtered to delayed" },
+  { id: "boarding", label: "Boarding", value: "12", line: "So far today", opens: "the Flights page, filtered to boarded today" },
+  { id: "cancelled", label: "Cancelled", value: "4", line: "2% of today's flights", opens: "the Flights page, filtered to cancelled" },
+  { id: "gates-in-use", label: "Gates in use", value: "28/34", line: "5 available · 1 unavailable", opens: "the Gates page" },
 ];
 
 /** Rows in "Needs attention" order (the default sort). */
