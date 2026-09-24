@@ -96,7 +96,8 @@ function Row({ f, selected, onOpen }: { f: Flight; selected: boolean; onOpen: ()
           </span>
         </div>
       </td>
-      <td className={cn(td, "truncate", cancelled ? "text-quaternary" : "text-secondary")}>
+      {/* No right padding: at 1440 the 167 px column is only wide enough for "Istanbul → Amsterdam" this way (as in Figma). */}
+      <td className={cn(td, "truncate pr-0", cancelled ? "text-quaternary" : "text-secondary")}>
         {f.from} → {f.to}
       </td>
       <td className={cn(td, cancelled ? "text-quaternary line-through" : "text-tertiary")}>{f.sched}</td>
